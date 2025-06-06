@@ -32,10 +32,6 @@ for (const [name, value] of Object.entries({
   }
 }
 
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled promise rejection:', err);
-});
-
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once('ready', async () => {
