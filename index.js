@@ -69,7 +69,7 @@ client.once('ready', async () => {
         'Ao longo do tempo, você poderá acumular pontos e trocá-los por prêmios incríveis!\n\n' +
         'Aproveite essa oportunidade e faça parte do nosso sistema de pontos!'
       )
-      .setFooter({ text: 'DinastIA - Bem-vindo ao Sistema de Pontos!' });
+      .setFooter({ text: '👑DinastIA - Bem-vindo ao Sistema de Pontos!' });
 
     await channel.send({ embeds: [embed], components: [row] });
     console.log('Message sent.');
