@@ -62,7 +62,7 @@ client.once('ready', async () => {
 
     const embed = new EmbedBuilder()
       .setColor('#00a550') // Green color for the embed border
-      .setTitle('👑 Cadastre-se no Sistema de Pontos da Dinastia!')
+      .setTitle('🚀 Cadastre-se no Sistema de Pontos da Dinastia!')
       .setDescription(
         'Ao clicar no botão abaixo, você irá preencher um formulário de cadastro do sistema de pontos.\n\n' +
         'Esse sistema é uma forma de recompensar você por sua participação ativa na comunidade Dinastia.\n\n' +
