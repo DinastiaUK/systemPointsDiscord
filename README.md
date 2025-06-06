@@ -9,4 +9,17 @@ Este repositório contém um bot simples do Discord que envia uma mensagem de ca
 3. Execute `npm start` para iniciar o bot. O servidor HTTP será iniciado na porta definida em `PORT` (padrão `9090`).
 
 O bot envia a mensagem no canal definido em `CADASTRE-SE_ID` quando inicia. Ao clicar em **Cadastre-se**, o usuário fornece os dados de contato que são enviados para o webhook configurado em `CADASTRE-SE_WEBHOOK`.
+
+## Docker
+
+Este projeto inclui um `Dockerfile`. Para criar uma imagem e executar o bot
+em um contêiner, utilize:
+
+```bash
+docker build -t system-points .
+docker run --env-file .env system-points
+```
+
+Certifique-se de fornecer um arquivo `.env` com todas as variáveis de
+ambiente necessárias.
 Se `BOT_INVITE_URL` estiver definido, a página inicial do servidor exibe um link para convidar o bot.
