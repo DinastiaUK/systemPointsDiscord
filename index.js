@@ -54,20 +54,22 @@ client.once('ready', async () => {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('register')
-        .setLabel('Cadastre-se')
-        .setStyle(ButtonStyle.Primary)
+        .setLabel('⚡ Fazer Cadastro')
+        .setStyle(ButtonStyle.Success)
+        .setEmoji('⚡')
     );
 
-    const description = `\u{1F680} Cadastre-se no Sistema de Pontos da Dinastia!
-Ao clicar no bot\u00E3o abaixo, voc\u00EA ir\u00E1 preencher um formul\u00E1rio de cadastro do sistema de pontos.
+    const description = `**👑 Cadastre-se no Sistema de Pontos da Dinastia!**
 
-Esse sistema \u00E9 uma forma de recompensar voc\u00EA por sua participa\u00E7\u00E3o ativa na comunidade Dinastia.
+Ao clicar no botão abaixo, você irá preencher um formulário de cadastro do sistema de pontos.
 
-Ao longo do tempo, voc\u00EA poder\u00E1 acumular pontos e troc\u00E1-los por pr\u00EAmios incr\u00EDveis!
+Esse sistema é uma forma de recompensar você por sua participação ativa na comunidade Dinastia.
 
-Aproveite essa oportunidade e fa\u00E7a parte do nosso sistema de pontos!
+Ao longo do tempo, você poderá acumular pontos e trocá-los por prêmios incríveis!
 
-DinastIA - Bem-vindo ao Sistema de Pontos!`;
+Aproveite essa oportunidade e faça parte do nosso sistema de pontos!
+
+👑 **DinastIA - Bem-vindo ao Sistema de Pontos!**`;
 
     await channel.send({ content: description, components: [row] });
     console.log('Message sent.');
