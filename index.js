@@ -1,6 +1,14 @@
 import 'dotenv/config';
 import express from 'express';
-import fetch from 'node-fetch';
+// Use dynamic import for fetch to ensure compatibility
+let fetch;
+import('node-fetch').then(module => {
+  fetch = module.default;
+}).catch(err => {
+  console.error('Error importing node-fetch:', err);
+  process.exit(1);
+});
+
 import {
   Client,
   GatewayIntentBits,
@@ -100,6 +108,13 @@ client.on('interactionCreate', async (interaction) => {
     const whatsapp = interaction.fields.getTextInputValue('whatsapp');
 
     try {
+      // Check if fetch is available
+      if (!fetch) {
+        console.error('fetch is not initialized yet');
+        await interaction.reply({ content: 'Erro interno do servidor. Tente novamente mais tarde.', ephemeral: true });
+        return;
+      }
+      
       await fetch(CADASTRE_SE_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
