@@ -12,13 +12,25 @@ import {
   InteractionType,
 } from 'discord.js';
 
-const {
+const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const BOT_INVITE_URL = process.env.BOT_INVITE_URL;
+const PORT = process.env.PORT ?? 9090;
+const CADASTRE_SE_ID =
+  process.env.CADASTRE_SE_ID || process.env['CADASTRE-SE_ID'];
+const CADASTRE_SE_WEBHOOK =
+  process.env.CADASTRE_SE_WEBHOOK || process.env['CADASTRE-SE_WEBHOOK'];
+
+// Validate required environment variables early
+for (const [name, value] of Object.entries({
   DISCORD_TOKEN,
   CADASTRE_SE_ID,
   CADASTRE_SE_WEBHOOK,
-  BOT_INVITE_URL,
-  PORT = 9090,
-} = process.env;
+})) {
+  if (!value) {
+    console.error(`Environment variable ${name} is not set`);
+    process.exit(1);
+  }
+}
 
 // Validate required environment variables early
 for (const [name, value] of Object.entries({
