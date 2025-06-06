@@ -12,7 +12,18 @@ import { EmbedBuilder } from 'discord.js';
  */
 export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
   try {
-    console.log('Fetching daily rank data...');
+    // Validate inputs
+    if (!rankChannelId || rankChannelId === '') {
+      console.error('Invalid rank channel ID. Cannot post daily rank.');
+      return;
+    }
+    
+    if (!webhookUrl || webhookUrl === '') {
+      console.error('Invalid webhook URL. Cannot fetch rank data.');
+      return;
+    }
+    
+    console.log(`Fetching daily rank data from ${webhookUrl}...`);
     
     // Check if fetch is available
     if (typeof fetch !== 'function') {
@@ -20,6 +31,8 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
       return;
     }
     
+    // Fetch rank data
+    console.log(`Attempting to fetch data from: ${webhookUrl}`);
     const response = await fetch(webhookUrl, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
@@ -32,9 +45,17 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
     const rankData = await response.json();
     
     // Get the channel
-    const channel = await client.channels.fetch(rankChannelId);
-    if (!channel) {
-      console.error('Rank channel not found');
+    let channel;
+    try {
+      channel = await client.channels.fetch(rankChannelId);
+      if (!channel) {
+        console.error(`Rank channel not found with ID: ${rankChannelId}`);
+        return;
+      }
+      console.log(`Successfully found rank channel: ${channel.name}`);
+    } catch (channelError) {
+      console.error(`Failed to fetch rank channel (ID: ${rankChannelId}):`, channelError.message);
+      console.error('Please check that the RANK_ID is correct and the bot has access to this channel.');
       return;
     }
     

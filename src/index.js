@@ -51,16 +51,37 @@ client.once('ready', async () => {
   console.log(`Logged in as ${client.user.tag}`);
   
   try {
-    // Send registration message
-    const channel = await client.channels.fetch(CADASTRE_SE_ID);
-    if (!channel) {
-      console.error('Registration channel not found');
+    // Validate channel IDs
+    if (!CADASTRE_SE_ID || CADASTRE_SE_ID === '') {
+      console.warn('CADASTRE_SE_ID is not set. Registration message will not be sent.');
     } else {
-      await sendRegistrationMessage(channel);
+      try {
+        // Send registration message
+        const channel = await client.channels.fetch(CADASTRE_SE_ID);
+        if (channel) {
+          await sendRegistrationMessage(channel);
+          console.log(`Registration message sent to channel: ${channel.name}`);
+        }
+      } catch (channelError) {
+        console.error(`Failed to fetch registration channel (ID: ${CADASTRE_SE_ID}):`, channelError.message);
+        console.error('Please check that the CADASTRE_SE_ID is correct and the bot has access to this channel.');
+      }
     }
     
     // Set up daily rank scheduler
-    scheduleDailyRank(client, RANK_ID, RANK_WEBHOOK);
+    if (!RANK_ID || RANK_ID === '') {
+      console.warn('RANK_ID is not set. Daily rank will not be posted to a channel.');
+    } else {
+      try {
+        // Validate rank channel exists
+        await client.channels.fetch(RANK_ID);
+        scheduleDailyRank(client, RANK_ID, RANK_WEBHOOK);
+        console.log(`Daily rank scheduler set up for channel ID: ${RANK_ID}`);
+      } catch (rankChannelError) {
+        console.error(`Failed to fetch rank channel (ID: ${RANK_ID}):`, rankChannelError.message);
+        console.error('Please check that the RANK_ID is correct and the bot has access to this channel.');
+      }
+    }
   } catch (err) {
     console.error('Error during initialization:', err);
   }
