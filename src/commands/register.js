@@ -58,12 +58,14 @@ export async function handleRegisterButton(interaction) {
     .setCustomId('email')
     .setLabel('E-mail')
     .setStyle(TextInputStyle.Short)
+    .setPlaceholder('comercial@dinastia.uk')
     .setRequired(true);
 
   const whatsappInput = new TextInputBuilder()
     .setCustomId('whatsapp')
     .setLabel('WhatsApp')
     .setStyle(TextInputStyle.Short)
+    .setPlaceholder('557899009909')
     .setRequired(true);
 
   modal.addComponents(
