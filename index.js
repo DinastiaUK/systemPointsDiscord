@@ -19,6 +19,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
   InteractionType,
+  EmbedBuilder,
 } from 'discord.js';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
@@ -54,24 +55,23 @@ client.once('ready', async () => {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('register')
-        .setLabel('⚡ Fazer Cadastro')
+        .setLabel('Fazer Cadastro')
         .setStyle(ButtonStyle.Success)
         .setEmoji('⚡')
     );
 
-    const description = `**👑 Cadastre-se no Sistema de Pontos da Dinastia!**
+    const embed = new EmbedBuilder()
+      .setColor('#00a550') // Green color for the embed border
+      .setTitle('👑 Cadastre-se no Sistema de Pontos da Dinastia!')
+      .setDescription(
+        'Ao clicar no botão abaixo, você irá preencher um formulário de cadastro do sistema de pontos.\n\n' +
+        'Esse sistema é uma forma de recompensar você por sua participação ativa na comunidade Dinastia.\n\n' +
+        'Ao longo do tempo, você poderá acumular pontos e trocá-los por prêmios incríveis!\n\n' +
+        'Aproveite essa oportunidade e faça parte do nosso sistema de pontos!'
+      )
+      .setFooter({ text: 'DinastIA - Bem-vindo ao Sistema de Pontos!' });
 
-Ao clicar no botão abaixo, você irá preencher um formulário de cadastro do sistema de pontos.
-
-Esse sistema é uma forma de recompensar você por sua participação ativa na comunidade Dinastia.
-
-Ao longo do tempo, você poderá acumular pontos e trocá-los por prêmios incríveis!
-
-Aproveite essa oportunidade e faça parte do nosso sistema de pontos!
-
-👑 **DinastIA - Bem-vindo ao Sistema de Pontos!**`;
-
-    await channel.send({ content: description, components: [row] });
+    await channel.send({ embeds: [embed], components: [row] });
     console.log('Message sent.');
   } catch (err) {
     console.error('Failed to send message:', err);
