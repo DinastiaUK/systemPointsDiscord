@@ -92,6 +92,14 @@ export async function handleRegisterModalSubmit(interaction, webhookUrl) {
       return;
     }
     
+    // Validate webhook URL
+    if (!webhookUrl || webhookUrl.includes('your-webhook-url.com') || webhookUrl === '') {
+      console.error('Invalid webhook URL:', webhookUrl);
+      await interaction.reply({ content: 'Configuração incompleta. Por favor, contate o administrador.', ephemeral: true });
+      return;
+    }
+    
+    console.log(`Sending registration data to webhook: ${webhookUrl}`);
     await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

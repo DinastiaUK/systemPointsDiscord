@@ -18,6 +18,10 @@ export function setupInteractionHandler(client, webhookUrl) {
           case 'register':
             await handleRegisterButton(interaction);
             break;
+          case 'start_onboarding':
+            // Handle the start_onboarding button - redirect to register functionality
+            await handleRegisterButton(interaction);
+            break;
           default:
             console.log(`Unknown button interaction: ${interaction.customId}`);
         }

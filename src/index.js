@@ -66,8 +66,18 @@ client.once('ready', async () => {
   }
 });
 
+// Validate Discord token before login
+if (!DISCORD_TOKEN || DISCORD_TOKEN === '') {
+  console.error('ERROR: Discord token is missing or empty. Please set the DISCORD_TOKEN environment variable.');
+  process.exit(1);
+}
+
 // Login to Discord
-client.login(DISCORD_TOKEN);
+client.login(DISCORD_TOKEN).catch(error => {
+  console.error('Failed to login to Discord:', error);
+  console.error('Please check that your Discord token is valid.');
+  process.exit(1);
+});
 
 // Set up Express server
 const app = express();
