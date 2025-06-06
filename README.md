@@ -4,6 +4,12 @@ Este repositório contém um bot simples do Discord que envia uma mensagem de ca
 
 ## Configuração
 
+
+1. Abra o arquivo `.env` e preencha as variáveis `DISCORD_TOKEN`, `CADASTRE_SE_ID`, `CADASTRE_SE_WEBHOOK` e outras se necessário.
+
+As variáveis usam sublinhado `_`, não hífen `-`. Caso algum dos valores não
+esteja definido (por exemplo `CADASTRE_SE_ID`), o bot encerrará informando
+qual variável está ausente.
 1. Copie `.env.example` para `.env` e preencha as variáveis `DISCORD_TOKEN`, `CADASTRE_SE_ID`, `CADASTRE_SE_WEBHOOK` e outras se necessário.
 2. Instale as dependências com `npm install` (requer acesso à internet).
 3. Execute `npm start` para iniciar o bot. O servidor HTTP será iniciado na porta definida em `PORT` (padrão `9090`).
