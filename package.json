@@ -1,0 +1,15 @@
+{
+  "name": "system-points-discord",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No tests specified\""
+  },
+  "dependencies": {
+    "discord.js": "^14.17.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
