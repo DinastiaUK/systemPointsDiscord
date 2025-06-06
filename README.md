@@ -1,5 +1,6 @@
 # systemPointsDiscord
 
-This repository contains SQL queries to criar as tabelas para o sistema de pontos do Discord.
+This repository contains SQL queries to create the tables for the Discord points system.
 
-Veja o arquivo `schema.sql` para a definicao das tabelas.
+See `schema.sql` for the table definitions and predefined point values.
+
