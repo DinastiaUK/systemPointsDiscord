@@ -32,18 +32,6 @@ for (const [name, value] of Object.entries({
   }
 }
 
-// Validate required environment variables early
-for (const [name, value] of Object.entries({
-  DISCORD_TOKEN,
-  CADASTRE_SE_ID,
-  CADASTRE_SE_WEBHOOK,
-})) {
-  if (!value) {
-    console.error(`Environment variable ${name} is not set`);
-    process.exit(1);
-  }
-}
-
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once('ready', async () => {
