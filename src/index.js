@@ -112,7 +112,7 @@ client.once('ready', async () => {
       try {
         // Validate rank channel exists
         await client.channels.fetch(RANK_ID);
-        scheduleDailyRank(client, RANK_ID, RANK_WEBHOOK);
+        scheduleDailyRank(client, RANK_ID, RANK_WEBHOOK, AUTH_WEBHOOK);
         console.log(`Daily rank scheduler set up for channel ID: ${RANK_ID}`);
       } catch (rankChannelError) {
         console.error(`Failed to fetch rank channel (ID: ${RANK_ID}):`, rankChannelError.message);

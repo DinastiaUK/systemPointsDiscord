@@ -8,9 +8,10 @@ import { EmbedBuilder } from 'discord.js';
  * @param {Object} client - Discord client
  * @param {string} rankChannelId - ID of the channel to post the rank
  * @param {string} webhookUrl - URL of the webhook to fetch rank data
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
+export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl, authToken) {
   try {
     // Validate inputs
     if (!rankChannelId || rankChannelId === '') {
@@ -33,16 +34,38 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
     
     // Fetch rank data
     console.log(`Attempting to fetch data from: ${webhookUrl}`);
+    
+    const headers = { 
+      'Accept': 'text/plain, application/json' 
+    };
+    
+    // Add auth token if available
+    if (authToken) {
+      headers['Authorization'] = authToken;
+    }
+    
     const response = await fetch(webhookUrl, {
       method: 'GET',
-      headers: { 'Accept': 'application/json' }
+      headers: headers
     });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch rank data: ${response.status} ${response.statusText}`);
     }
     
-    const rankData = await response.json();
+    // Primeiro tentamos obter o texto da resposta
+    const responseText = await response.text();
+    console.log('Rank response received:', responseText);
+    
+    // Verificamos se a resposta é um texto simples ou um JSON
+    let rankData;
+    try {
+      // Tentamos converter para JSON
+      rankData = JSON.parse(responseText);
+    } catch (e) {
+      // Se não for um JSON válido, usamos o texto como está
+      console.log('Response is not valid JSON, using as plain text');
+    }
     
     // Get the channel
     let channel;
@@ -63,12 +86,13 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
     const embed = new EmbedBuilder()
       .setColor('#FFD700') // Gold color for rank
       .setTitle('🏆 Ranking Diário do Sistema de Pontos')
-      .setDescription('Confira os membros que mais se destacaram hoje!')
       .setTimestamp()
       .setFooter({ text: '👑 DinastIA - Sistema de Pontos' });
     
-    // Add fields for each ranked user
-    if (Array.isArray(rankData) && rankData.length > 0) {
+    // Se temos um objeto JSON válido, processamos normalmente
+    if (rankData && Array.isArray(rankData) && rankData.length > 0) {
+      embed.setDescription('Confira os membros que mais se destacaram hoje!');
+      
       // Limit to top 10 users
       const topUsers = rankData.slice(0, 10);
       
@@ -81,7 +105,13 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl) {
           inline: true
         });
       });
-    } else {
+    } 
+    // Se não é um JSON válido, mas temos texto, usamos o texto como descrição
+    else if (responseText && responseText.trim() !== '') {
+      embed.setDescription(responseText);
+    }
+    // Se não temos dados válidos
+    else {
       embed.setDescription('Nenhum dado de ranking disponível para hoje.');
     }
     

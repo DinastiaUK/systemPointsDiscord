@@ -8,8 +8,9 @@ import { fetchAndPostDailyRank } from '../commands/dailyRank.js';
  * @param {Object} client - Discord client
  * @param {string} rankChannelId - ID of the channel to post the rank
  * @param {string} webhookUrl - URL of the webhook to fetch rank data
+ * @param {string} authToken - Authentication token for webhook requests
  */
-export function scheduleDailyRank(client, rankChannelId, webhookUrl) {
+export function scheduleDailyRank(client, rankChannelId, webhookUrl, authToken) {
   console.log('Setting up daily rank scheduler...');
   
   // Function to calculate milliseconds until next 8:00 AM São Paulo time
@@ -43,7 +44,7 @@ export function scheduleDailyRank(client, rankChannelId, webhookUrl) {
     
     setTimeout(() => {
       // Execute the rank update
-      fetchAndPostDailyRank(client, rankChannelId, webhookUrl)
+      fetchAndPostDailyRank(client, rankChannelId, webhookUrl, authToken)
         .catch(err => console.error('Error in scheduled rank update:', err))
         .finally(() => {
           // Schedule the next run
