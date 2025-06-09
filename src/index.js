@@ -19,6 +19,7 @@ import { validateEnvVars } from './utils/env.js';
 import { setupInteractionHandler } from './handlers/interactions.js';
 import { sendRegistrationMessage } from './commands/register.js';
 import { sendConsultPointsMessage } from './commands/consultPoints.js';
+import { sendManagePointsMessage } from './commands/managePoints.js';
 import { scheduleDailyRank } from './utils/scheduler.js';
 
 // Environment variables
@@ -31,6 +32,8 @@ const RANK_WEBHOOK = process.env.RANK_WEBHOOK || 'https://n8n.dinastia.uk/webhoo
 const RANK_ID = process.env.RANK_ID || '1369785587862601768';
 const CONSULTAR_PONTOS_ID = process.env.CONSULTAR_PONTOS_ID;
 const CONSULTAR_PONTOS_WEBHOOK = process.env.CONSULTAR_PONTOS_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/pontos';
+const GERENCIADOR_PONTOS_ID = process.env.GERENCIADOR_PONTOS_ID;
+const GERENCIADOR_PONTOS_WEBHOOK = process.env.GERENCIADOR_PONTOS_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/gerenciar';
 
 // Validate required environment variables
 validateEnvVars({
@@ -43,7 +46,7 @@ validateEnvVars({
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Set up interaction handler
-setupInteractionHandler(client, CADASTRE_SE_WEBHOOK, CONSULTAR_PONTOS_WEBHOOK);
+setupInteractionHandler(client, CADASTRE_SE_WEBHOOK, CONSULTAR_PONTOS_WEBHOOK, GERENCIADOR_PONTOS_WEBHOOK);
 
 // Handle ready event
 client.once('ready', async () => {
@@ -81,6 +84,23 @@ client.once('ready', async () => {
       } catch (channelError) {
         console.error(`Failed to fetch points consultation channel (ID: ${CONSULTAR_PONTOS_ID}):`, channelError.message);
         console.error('Please check that the CONSULTAR_PONTOS_ID is correct and the bot has access to this channel.');
+      }
+    }
+    
+    // Send points management message
+    if (!GERENCIADOR_PONTOS_ID || GERENCIADOR_PONTOS_ID === '') {
+      console.warn('GERENCIADOR_PONTOS_ID is not set. Points management message will not be sent.');
+    } else {
+      try {
+        // Send points management message
+        const manageChannel = await client.channels.fetch(GERENCIADOR_PONTOS_ID);
+        if (manageChannel) {
+          await sendManagePointsMessage(manageChannel);
+          console.log(`Points management message sent to channel: ${manageChannel.name}`);
+        }
+      } catch (channelError) {
+        console.error(`Failed to fetch points management channel (ID: ${GERENCIADOR_PONTOS_ID}):`, channelError.message);
+        console.error('Please check that the GERENCIADOR_PONTOS_ID is correct and the bot has access to this channel.');
       }
     }
     
