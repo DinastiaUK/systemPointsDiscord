@@ -67,14 +67,16 @@ export async function handleConsultPointsButton(interaction, webhookUrl) {
       // Fetch user points data
       const response = await fetch(`${webhookUrl}?discordId=${discordId}`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        headers: { 'Accept': 'text/plain, application/json' }
       });
       
       if (!response.ok) {
         throw new Error(`Failed to fetch points data: ${response.status} ${response.statusText}`);
       }
       
-      const userData = await response.json();
+      // Primeiro tentamos obter o texto da resposta
+      const responseText = await response.text();
+      console.log('Response received:', responseText);
       
       // Create an embed to display the user's points
       const embed = new EmbedBuilder()
@@ -83,20 +85,8 @@ export async function handleConsultPointsButton(interaction, webhookUrl) {
         .setTimestamp()
         .setFooter({ text: '👑 DinastIA - Sistema de Pontos' });
       
-      if (userData && userData.points !== undefined) {
-        embed.setDescription(`Você possui **${userData.points}** pontos acumulados!`);
-        
-        // Add additional info if available
-        if (userData.rank !== undefined) {
-          embed.addFields({ name: 'Sua Posição no Ranking', value: `#${userData.rank}`, inline: true });
-        }
-        
-        if (userData.username) {
-          embed.setAuthor({ name: userData.username });
-        }
-      } else {
-        embed.setDescription('Não encontramos pontos registrados para você. Participe mais da comunidade para ganhar pontos!');
-      }
+      // Exibir o texto exatamente como recebido do webhook
+      embed.setDescription(responseText);
       
       await interaction.editReply({ embeds: [embed] });
       
