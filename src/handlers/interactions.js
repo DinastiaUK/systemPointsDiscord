@@ -3,13 +3,15 @@
  */
 import { InteractionType } from 'discord.js';
 import { handleRegisterButton, handleRegisterModalSubmit } from '../commands/register.js';
+import { handleConsultPointsButton } from '../commands/consultPoints.js';
 
 /**
  * Sets up the interaction handler for the Discord client
  * @param {Object} client - Discord client
- * @param {string} webhookUrl - Webhook URL for form submissions
+ * @param {string} registerWebhookUrl - URL for the registration webhook
+ * @param {string} consultPointsWebhookUrl - URL for the points consultation webhook
  */
-export function setupInteractionHandler(client, webhookUrl) {
+export function setupInteractionHandler(client, registerWebhookUrl, consultPointsWebhookUrl) {
   client.on('interactionCreate', async (interaction) => {
     try {
       // Handle button interactions
@@ -21,6 +23,9 @@ export function setupInteractionHandler(client, webhookUrl) {
           case 'start_onboarding':
             // Handle the start_onboarding button - redirect to register functionality
             await handleRegisterButton(interaction);
+            break;
+          case 'consult_points':
+            await handleConsultPointsButton(interaction, consultPointsWebhookUrl);
             break;
           default:
             console.log(`Unknown button interaction: ${interaction.customId}`);

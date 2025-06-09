@@ -16,13 +16,10 @@ import('node-fetch').then(module => {
 
 // Import utility modules
 import { validateEnvVars } from './utils/env.js';
-import { scheduleDailyRank } from './utils/scheduler.js';
-
-// Import command modules
-import { sendRegistrationMessage } from './commands/register.js';
-
-// Import handlers
 import { setupInteractionHandler } from './handlers/interactions.js';
+import { sendRegistrationMessage } from './commands/register.js';
+import { sendConsultPointsMessage } from './commands/consultPoints.js';
+import { scheduleDailyRank } from './utils/scheduler.js';
 
 // Environment variables
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
@@ -32,6 +29,8 @@ const CADASTRE_SE_ID = process.env.CADASTRE_SE_ID || process.env['CADASTRE-SE_ID
 const CADASTRE_SE_WEBHOOK = process.env.CADASTRE_SE_WEBHOOK || process.env['CADASTRE-SE_WEBHOOK'];
 const RANK_WEBHOOK = process.env.RANK_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/pontos';
 const RANK_ID = process.env.RANK_ID || '1369785587862601768';
+const CONSULTAR_PONTOS_ID = process.env.CONSULTAR_PONTOS_ID;
+const CONSULTAR_PONTOS_WEBHOOK = process.env.CONSULTAR_PONTOS_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/pontos';
 
 // Validate required environment variables
 validateEnvVars({
@@ -44,7 +43,7 @@ validateEnvVars({
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Set up interaction handler
-setupInteractionHandler(client, CADASTRE_SE_WEBHOOK);
+setupInteractionHandler(client, CADASTRE_SE_WEBHOOK, CONSULTAR_PONTOS_WEBHOOK);
 
 // Handle ready event
 client.once('ready', async () => {
@@ -65,6 +64,23 @@ client.once('ready', async () => {
       } catch (channelError) {
         console.error(`Failed to fetch registration channel (ID: ${CADASTRE_SE_ID}):`, channelError.message);
         console.error('Please check that the CADASTRE_SE_ID is correct and the bot has access to this channel.');
+      }
+    }
+    
+    // Send points consultation message
+    if (!CONSULTAR_PONTOS_ID || CONSULTAR_PONTOS_ID === '') {
+      console.warn('CONSULTAR_PONTOS_ID is not set. Points consultation message will not be sent.');
+    } else {
+      try {
+        // Send points consultation message
+        const consultChannel = await client.channels.fetch(CONSULTAR_PONTOS_ID);
+        if (consultChannel) {
+          await sendConsultPointsMessage(consultChannel);
+          console.log(`Points consultation message sent to channel: ${consultChannel.name}`);
+        }
+      } catch (channelError) {
+        console.error(`Failed to fetch points consultation channel (ID: ${CONSULTAR_PONTOS_ID}):`, channelError.message);
+        console.error('Please check that the CONSULTAR_PONTOS_ID is correct and the bot has access to this channel.');
       }
     }
     
