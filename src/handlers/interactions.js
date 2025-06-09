@@ -4,7 +4,7 @@
 import { InteractionType } from 'discord.js';
 import { handleRegisterButton, handleRegisterModalSubmit } from '../commands/register.js';
 import { handleConsultPointsButton } from '../commands/consultPoints.js';
-import { handleManagePointsButton, handleManagePointsModalSubmit } from '../commands/managePoints.js';
+import { handleAddPointsButton, handleRemovePointsButton, handlePointsModalSubmit } from '../commands/managePoints.js';
 
 /**
  * Sets up the interaction handler for the Discord client
@@ -29,8 +29,11 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
           case 'consult_points':
             await handleConsultPointsButton(interaction, consultPointsWebhookUrl);
             break;
-          case 'manage_points':
-            await handleManagePointsButton(interaction);
+          case 'add_points':
+            await handleAddPointsButton(interaction);
+            break;
+          case 'remove_points':
+            await handleRemovePointsButton(interaction);
             break;
           default:
             console.log(`Unknown button interaction: ${interaction.customId}`);
@@ -42,8 +45,9 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
           case 'registerModal':
             await handleRegisterModalSubmit(interaction, registerWebhookUrl);
             break;
-          case 'managePointsModal':
-            await handleManagePointsModalSubmit(interaction, managePointsWebhookUrl);
+          case 'addPointsModal':
+          case 'removePointsModal':
+            await handlePointsModalSubmit(interaction, managePointsWebhookUrl);
             break;
           default:
             console.log(`Unknown modal submission: ${interaction.customId}`);
