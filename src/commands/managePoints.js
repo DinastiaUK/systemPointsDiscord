@@ -65,6 +65,14 @@ export async function handleManagePointsButton(interaction) {
       .setPlaceholder('123456789012345678')
       .setRequired(true);
 
+    // Create the action input (dropdown is not supported in modals, so we'll use a text input)
+    const actionInput = new TextInputBuilder()
+      .setCustomId('action')
+      .setLabel('Ação (digite "adicionar" ou "remover")')
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder('adicionar')
+      .setRequired(true);
+
     // Create the description input
     const descriptionInput = new TextInputBuilder()
       .setCustomId('description')
@@ -83,10 +91,11 @@ export async function handleManagePointsButton(interaction) {
 
     // Add inputs to the modal
     const userIdRow = new ActionRowBuilder().addComponents(userIdInput);
+    const actionRow = new ActionRowBuilder().addComponents(actionInput);
     const descriptionRow = new ActionRowBuilder().addComponents(descriptionInput);
     const pointsRow = new ActionRowBuilder().addComponents(pointsInput);
 
-    modal.addComponents(userIdRow, descriptionRow, pointsRow);
+    modal.addComponents(userIdRow, actionRow, descriptionRow, pointsRow);
 
     // Show the modal to the user
     await interaction.showModal(modal);
@@ -103,98 +112,42 @@ export async function handleManagePointsButton(interaction) {
  * @returns {Promise<void>}
  */
 export async function handleManagePointsModalSubmit(interaction, webhookUrl) {
-  const userId = interaction.fields.getTextInputValue('userId');
-  const description = interaction.fields.getTextInputValue('description');
-  const points = interaction.fields.getTextInputValue('points');
-  
-  // Show action selection menu
   try {
-    const row = new ActionRowBuilder().addComponents(
-      new StringSelectMenuBuilder()
-        .setCustomId('action_select')
-        .setPlaceholder('Selecione a ação')
-        .addOptions([
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Adicionar')
-            .setValue('add')
-            .setDescription('Adicionar pontos ao usuário')
-            .setEmoji('➕'),
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Remover')
-            .setValue('remove')
-            .setDescription('Remover pontos do usuário')
-            .setEmoji('➖'),
-        ])
-    );
-
-    // Store the form data in a temporary object for later use
-    const formData = {
-      userId,
-      description,
-      points
-    };
+    // Get form values
+    const userId = interaction.fields.getTextInputValue('userId');
+    const actionInput = interaction.fields.getTextInputValue('action').toLowerCase();
+    const description = interaction.fields.getTextInputValue('description');
+    const points = interaction.fields.getTextInputValue('points');
     
-    // Convert the form data to a JSON string and store it in a custom ID
-    const dataString = Buffer.from(JSON.stringify(formData)).toString('base64');
-    
-    await interaction.reply({
-      content: 'Selecione a ação a ser realizada:',
-      components: [row],
-      ephemeral: true,
-      // Store the data in the message for retrieval later
-      customId: `points_action_${dataString}`
-    });
-  } catch (err) {
-    console.error('Failed to process form submission:', err);
-    await interaction.reply({ content: 'Erro ao processar o formulário.', ephemeral: true });
-  }
-}
-
-/**
- * Handles the action selection for points management
- * @param {Object} interaction - Discord interaction object
- * @param {string} webhookUrl - URL for the points management webhook
- * @returns {Promise<void>}
- */
-export async function handleActionSelect(interaction, webhookUrl) {
-  try {
-    // Get the selected action
-    const action = interaction.values[0]; // 'add' or 'remove'
-    
-    // Get the original message custom ID which contains our data
-    const originalMessage = interaction.message;
-    const customId = originalMessage.customId;
-    
-    // Extract the data from the custom ID if it exists
-    let formData;
-    if (customId && customId.startsWith('points_action_')) {
-      const dataString = customId.replace('points_action_', '');
-      formData = JSON.parse(Buffer.from(dataString, 'base64').toString());
+    // Normalize action input
+    let action;
+    if (actionInput.includes('adicionar') || actionInput === 'add') {
+      action = 'add';
+    } else if (actionInput.includes('remover') || actionInput === 'remove') {
+      action = 'remove';
     } else {
-      // If we can't find the data, we need to get it from the message content
-      // This is a fallback and might not work in all cases
-      await interaction.update({ 
-        content: 'Erro ao recuperar dados do formulário. Por favor, tente novamente.', 
-        components: [] 
+      await interaction.reply({ 
+        content: 'Ação inválida. Por favor, use "adicionar" ou "remover".', 
+        ephemeral: true 
       });
       return;
     }
     
-    const { userId, description, points } = formData;
-    
     // Validate points value
     const pointsValue = parseInt(points, 10);
     if (isNaN(pointsValue) || pointsValue <= 0) {
-      await interaction.update({ 
+      await interaction.reply({ 
         content: 'O valor de pontos deve ser um número positivo.', 
-        components: [] 
+        ephemeral: true 
       });
       return;
     }
     
     // Send the data to the webhook
     try {
-      await fetch(webhookUrl, {
+      await interaction.deferReply({ ephemeral: true });
+      
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -207,21 +160,29 @@ export async function handleActionSelect(interaction, webhookUrl) {
         }),
       });
       
+      if (!response.ok) {
+        throw new Error(`Erro na resposta do servidor: ${response.status}`);
+      }
+      
       const actionText = action === 'add' ? 'adicionados' : 'removidos';
       
-      await interaction.update({ 
+      await interaction.editReply({ 
         content: `✅ Operação realizada com sucesso!\n\n**${pointsValue}** pontos foram ${actionText} ${action === 'add' ? 'para' : 'de'} <@${userId}>.\n**Motivo:** ${description}`, 
         components: [] 
       });
     } catch (error) {
       console.error('Error sending data to webhook:', error);
-      await interaction.update({ 
+      await interaction.editReply({ 
         content: 'Erro ao enviar dados para o servidor. Por favor, tente novamente.', 
         components: [] 
       });
     }
   } catch (err) {
-    console.error('Error handling action selection:', err);
-    await interaction.reply({ content: 'Ocorreu um erro ao processar sua seleção.', ephemeral: true });
+    console.error('Failed to process form submission:', err);
+    if (!interaction.replied) {
+      await interaction.reply({ content: 'Erro ao processar o formulário.', ephemeral: true });
+    }
   }
 }
+
+// A função handleActionSelect foi removida pois agora a ação é selecionada diretamente no modal

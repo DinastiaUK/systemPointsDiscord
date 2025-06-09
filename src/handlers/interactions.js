@@ -4,7 +4,7 @@
 import { InteractionType } from 'discord.js';
 import { handleRegisterButton, handleRegisterModalSubmit } from '../commands/register.js';
 import { handleConsultPointsButton } from '../commands/consultPoints.js';
-import { handleManagePointsButton, handleManagePointsModalSubmit, handleActionSelect } from '../commands/managePoints.js';
+import { handleManagePointsButton, handleManagePointsModalSubmit } from '../commands/managePoints.js';
 
 /**
  * Sets up the interaction handler for the Discord client
@@ -51,13 +51,7 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
       }
       // Handle select menu interactions
       else if (interaction.isStringSelectMenu()) {
-        switch (interaction.customId) {
-          case 'action_select':
-            await handleActionSelect(interaction, managePointsWebhookUrl);
-            break;
-          default:
-            console.log(`Unknown select menu interaction: ${interaction.customId}`);
-        }
+        console.log(`Received select menu interaction: ${interaction.customId}`);
       }
     } catch (error) {
       console.error('Error handling interaction:', error);
