@@ -34,6 +34,7 @@ const CONSULTAR_PONTOS_ID = process.env.CONSULTAR_PONTOS_ID;
 const CONSULTAR_PONTOS_WEBHOOK = process.env.CONSULTAR_PONTOS_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/pontos';
 const GERENCIADOR_PONTOS_ID = process.env.GERENCIADOR_PONTOS_ID;
 const GERENCIADOR_PONTOS_WEBHOOK = process.env.GERENCIADOR_PONTOS_WEBHOOK || 'https://n8n.dinastia.uk/webhook/v1/systempoints/gerenciar';
+const AUTH_WEBHOOK = process.env.AUTH_WEBHOOK || '';
 
 // Validate required environment variables
 validateEnvVars({
@@ -46,7 +47,7 @@ validateEnvVars({
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Set up interaction handler
-setupInteractionHandler(client, CADASTRE_SE_WEBHOOK, CONSULTAR_PONTOS_WEBHOOK, GERENCIADOR_PONTOS_WEBHOOK);
+setupInteractionHandler(client, CADASTRE_SE_WEBHOOK, CONSULTAR_PONTOS_WEBHOOK, GERENCIADOR_PONTOS_WEBHOOK, AUTH_WEBHOOK);
 
 // Handle ready event
 client.once('ready', async () => {

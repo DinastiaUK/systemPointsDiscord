@@ -12,28 +12,29 @@ import { handleAddPointsButton, handleRemovePointsButton, handlePointsModalSubmi
  * @param {string} registerWebhookUrl - URL for the registration webhook
  * @param {string} consultPointsWebhookUrl - URL for the points consultation webhook
  * @param {string} managePointsWebhookUrl - URL for the points management webhook
+ * @param {string} authToken - Authentication token for webhook requests
  */
-export function setupInteractionHandler(client, registerWebhookUrl, consultPointsWebhookUrl, managePointsWebhookUrl) {
+export function setupInteractionHandler(client, registerWebhookUrl, consultPointsWebhookUrl, managePointsWebhookUrl, authToken) {
   client.on('interactionCreate', async (interaction) => {
     try {
       // Handle button interactions
       if (interaction.isButton()) {
         switch (interaction.customId) {
           case 'register':
-            await handleRegisterButton(interaction);
+            await handleRegisterButton(interaction, authToken);
             break;
           case 'start_onboarding':
             // Handle the start_onboarding button - redirect to register functionality
-            await handleRegisterButton(interaction);
+            await handleRegisterButton(interaction, authToken);
             break;
           case 'consult_points':
-            await handleConsultPointsButton(interaction, consultPointsWebhookUrl);
+            await handleConsultPointsButton(interaction, consultPointsWebhookUrl, authToken);
             break;
           case 'add_points':
-            await handleAddPointsButton(interaction);
+            await handleAddPointsButton(interaction, authToken);
             break;
           case 'remove_points':
-            await handleRemovePointsButton(interaction);
+            await handleRemovePointsButton(interaction, authToken);
             break;
           default:
             console.log(`Unknown button interaction: ${interaction.customId}`);
@@ -43,11 +44,11 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
       else if (interaction.type === InteractionType.ModalSubmit) {
         switch (interaction.customId) {
           case 'registerModal':
-            await handleRegisterModalSubmit(interaction, registerWebhookUrl);
+            await handleRegisterModalSubmit(interaction, registerWebhookUrl, authToken);
             break;
           case 'addPointsModal':
           case 'removePointsModal':
-            await handlePointsModalSubmit(interaction, managePointsWebhookUrl);
+            await handlePointsModalSubmit(interaction, managePointsWebhookUrl, authToken);
             break;
           default:
             console.log(`Unknown modal submission: ${interaction.customId}`);

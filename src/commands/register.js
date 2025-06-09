@@ -47,9 +47,10 @@ export async function sendRegistrationMessage(channel) {
 /**
  * Handles the registration button interaction
  * @param {Object} interaction - Discord interaction object
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handleRegisterButton(interaction) {
+export async function handleRegisterButton(interaction, authToken) {
   const modal = new ModalBuilder()
     .setCustomId('registerModal')
     .setTitle('Cadastro Sistema de Pontos');
@@ -80,9 +81,10 @@ export async function handleRegisterButton(interaction) {
  * Handles the registration modal submission
  * @param {Object} interaction - Discord interaction object
  * @param {string} webhookUrl - Webhook URL to send the form data to
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handleRegisterModalSubmit(interaction, webhookUrl) {
+export async function handleRegisterModalSubmit(interaction, webhookUrl, authToken) {
   const email = interaction.fields.getTextInputValue('email');
   const whatsapp = interaction.fields.getTextInputValue('whatsapp');
 
@@ -102,9 +104,18 @@ export async function handleRegisterModalSubmit(interaction, webhookUrl) {
     }
     
     console.log(`Sending registration data to webhook: ${webhookUrl}`);
+    const headers = { 
+      'Content-Type': 'application/json' 
+    };
+    
+    // Add auth token if available
+    if (authToken) {
+      headers['Authorization'] = authToken;
+    }
+    
     await fetch(webhookUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify({
         email,
         whatsapp,

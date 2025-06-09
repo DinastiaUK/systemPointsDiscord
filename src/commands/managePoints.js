@@ -53,9 +53,10 @@ export async function sendManagePointsMessage(channel) {
 /**
  * Handles the add points button interaction
  * @param {Object} interaction - Discord interaction object
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handleAddPointsButton(interaction) {
+export async function handleAddPointsButton(interaction, authToken) {
   try {
     // Create the modal
     const modal = new ModalBuilder()
@@ -104,9 +105,10 @@ export async function handleAddPointsButton(interaction) {
 /**
  * Handles the remove points button interaction
  * @param {Object} interaction - Discord interaction object
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handleRemovePointsButton(interaction) {
+export async function handleRemovePointsButton(interaction, authToken) {
   try {
     // Create the modal
     const modal = new ModalBuilder()
@@ -156,9 +158,10 @@ export async function handleRemovePointsButton(interaction) {
  * Handles the points management modal submissions (both add and remove)
  * @param {Object} interaction - Discord interaction object
  * @param {string} webhookUrl - URL for the points management webhook
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handlePointsModalSubmit(interaction, webhookUrl) {
+export async function handlePointsModalSubmit(interaction, webhookUrl, authToken) {
   try {
     // Get form values
     const userId = interaction.fields.getTextInputValue('userId');
@@ -182,9 +185,18 @@ export async function handlePointsModalSubmit(interaction, webhookUrl) {
     try {
       await interaction.deferReply({ ephemeral: true });
       
+      const headers = { 
+        'Content-Type': 'application/json' 
+      };
+      
+      // Add auth token if available
+      if (authToken) {
+        headers['Authorization'] = authToken;
+      }
+      
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({
           userId,
           description,

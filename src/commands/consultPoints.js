@@ -46,9 +46,11 @@ export async function sendConsultPointsMessage(channel) {
 /**
  * Handles the consult points button interaction
  * @param {Object} interaction - Discord interaction object
+ * @param {string} webhookUrl - URL for the points consultation webhook
+ * @param {string} authToken - Authentication token for webhook requests
  * @returns {Promise<void>}
  */
-export async function handleConsultPointsButton(interaction, webhookUrl) {
+export async function handleConsultPointsButton(interaction, webhookUrl, authToken) {
   try {
     await interaction.deferReply({ ephemeral: true });
     
@@ -65,9 +67,18 @@ export async function handleConsultPointsButton(interaction, webhookUrl) {
     
     try {
       // Fetch user points data
+      const headers = { 
+        'Accept': 'text/plain, application/json'
+      };
+      
+      // Add auth token if available
+      if (authToken) {
+        headers['Authorization'] = authToken;
+      }
+      
       const response = await fetch(`${webhookUrl}?discordId=${discordId}`, {
         method: 'GET',
-        headers: { 'Accept': 'text/plain, application/json' }
+        headers: headers
       });
       
       if (!response.ok) {
