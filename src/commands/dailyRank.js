@@ -1,7 +1,6 @@
 /**
  * Daily rank command module
  */
-import { EmbedBuilder } from 'discord.js';
 
 /**
  * Fetches the daily rank data from the webhook and posts it to the specified channel
@@ -82,40 +81,39 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl, a
       return;
     }
     
-    // Create an embed for the rank data
-    const embed = new EmbedBuilder()
-      .setColor('#FFD700') // Gold color for rank
-      .setTitle('🏆 Ranking Diário do Sistema de Pontos')
-      .setTimestamp()
-      .setFooter({ text: '👑 DinastIA - Sistema de Pontos' });
+    // Preparar a mensagem para enviar ao canal
+    let messageContent;
     
-    // Se temos um objeto JSON válido, processamos normalmente
+    // Determinar o conteúdo da mensagem com base no tipo de dados recebidos
     if (rankData && Array.isArray(rankData) && rankData.length > 0) {
-      embed.setDescription('Confira os membros que mais se destacaram hoje!');
-      
-      // Limit to top 10 users
-      const topUsers = rankData.slice(0, 10);
-      
-      // Add each user to the embed
-      topUsers.forEach((user, index) => {
-        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-        embed.addFields({
-          name: `${medal} ${user.username || 'Usuário'}`,
-          value: `Pontos: **${user.points || 0}**`,
-          inline: true
+      // Se for um array de usuários, formatar a mensagem
+      try {
+        // Limitar a 10 usuários
+        const topUsers = rankData.slice(0, 10);
+        
+        // Criar uma mensagem formatada
+        messageContent = '**🏆 Ranking Diário do Sistema de Pontos**\n\n';
+        messageContent += 'Confira os membros que mais se destacaram hoje!\n\n';
+        
+        topUsers.forEach((user, index) => {
+          const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+          messageContent += `${medal} **${user.username || 'Usuário'}** - Pontos: **${user.points || 0}**\n`;
         });
-      });
+      } catch (e) {
+        console.error('Error formatting rank data:', e);
+        messageContent = JSON.stringify(rankData, null, 2);
+      }
     } 
-    // Se não é um JSON válido, mas temos texto, usamos o texto como descrição
+    // Se não é um JSON válido, mas temos texto, usamos o texto diretamente
     else if (responseText && responseText.trim() !== '') {
-      embed.setDescription(responseText);
+      messageContent = responseText;
     }
     // Se não temos dados válidos
     else {
-      embed.setDescription('Nenhum dado de ranking disponível para hoje.');
+      messageContent = 'Nenhum dado de ranking disponível para hoje.';
     }
     
-    await channel.send({ embeds: [embed] });
+    await channel.send(messageContent);
     console.log('Daily rank posted successfully.');
   } catch (err) {
     console.error('Failed to fetch and post daily rank:', err);
