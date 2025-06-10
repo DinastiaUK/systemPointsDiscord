@@ -20,7 +20,7 @@ export async function sendConsultPointsMessage(channel) {
   try {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId('consult_points')
+        .setCustomId('dinastia_consult_points')
         .setLabel('Consultar Pontos')
         .setStyle(ButtonStyle.Primary)
         .setEmoji('🔍')

@@ -20,7 +20,7 @@ export async function sendRegistrationMessage(channel) {
   try {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId('register')
+        .setCustomId('dinastia_register')
         .setLabel('Fazer Cadastro')
         .setStyle(ButtonStyle.Success)
         .setEmoji('⚡')
@@ -52,7 +52,7 @@ export async function sendRegistrationMessage(channel) {
  */
 export async function handleRegisterButton(interaction, authToken) {
   const modal = new ModalBuilder()
-    .setCustomId('registerModal')
+    .setCustomId('dinastia_registerModal')
     .setTitle('Cadastro Sistema de Pontos');
 
   const emailInput = new TextInputBuilder()

@@ -22,12 +22,12 @@ export async function sendManagePointsMessage(channel) {
   try {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId('add_points')
+        .setCustomId('dinastia_add_points')
         .setLabel('Adicionar Pontos')
         .setStyle(ButtonStyle.Success)
         .setEmoji('➕'),
       new ButtonBuilder()
-        .setCustomId('remove_points')
+        .setCustomId('dinastia_remove_points')
         .setLabel('Remover Pontos')
         .setStyle(ButtonStyle.Danger)
         .setEmoji('➖')
@@ -60,7 +60,7 @@ export async function handleAddPointsButton(interaction, authToken) {
   try {
     // Create the modal
     const modal = new ModalBuilder()
-      .setCustomId('addPointsModal')
+      .setCustomId('dinastia_addPointsModal')
       .setTitle('Adicionar Pontos');
 
     // Create the user ID input
@@ -112,7 +112,7 @@ export async function handleRemovePointsButton(interaction, authToken) {
   try {
     // Create the modal
     const modal = new ModalBuilder()
-      .setCustomId('removePointsModal')
+      .setCustomId('dinastia_removePointsModal')
       .setTitle('Remover Pontos');
 
     // Create the user ID input

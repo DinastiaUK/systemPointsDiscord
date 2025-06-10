@@ -20,20 +20,16 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
       // Handle button interactions
       if (interaction.isButton()) {
         switch (interaction.customId) {
-          case 'register':
+          case 'dinastia_register':
             await handleRegisterButton(interaction, authToken);
             break;
-          case 'start_onboarding':
-            // Handle the start_onboarding button - redirect to register functionality
-            await handleRegisterButton(interaction, authToken);
-            break;
-          case 'consult_points':
+          case 'dinastia_consult_points':
             await handleConsultPointsButton(interaction, consultPointsWebhookUrl, authToken);
             break;
-          case 'add_points':
+          case 'dinastia_add_points':
             await handleAddPointsButton(interaction, authToken);
             break;
-          case 'remove_points':
+          case 'dinastia_remove_points':
             await handleRemovePointsButton(interaction, authToken);
             break;
           default:
@@ -43,11 +39,11 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
       // Handle modal submissions
       else if (interaction.type === InteractionType.ModalSubmit) {
         switch (interaction.customId) {
-          case 'registerModal':
+          case 'dinastia_registerModal':
             await handleRegisterModalSubmit(interaction, registerWebhookUrl, authToken);
             break;
-          case 'addPointsModal':
-          case 'removePointsModal':
+          case 'dinastia_addPointsModal':
+          case 'dinastia_removePointsModal':
             await handlePointsModalSubmit(interaction, managePointsWebhookUrl, authToken);
             break;
           default:
