@@ -66,10 +66,18 @@ export async function handleAddPointsButton(interaction, authToken) {
     // Create the user ID input
     const userIdInput = new TextInputBuilder()
       .setCustomId('userId')
-      .setLabel('ID do Usuário')
+      .setLabel('ID do Usuário (ou preencha o Email)')
       .setStyle(TextInputStyle.Short)
       .setPlaceholder('123456789012345678')
-      .setRequired(true);
+      .setRequired(false);
+      
+    // Create the email input
+    const emailInput = new TextInputBuilder()
+      .setCustomId('email')
+      .setLabel('Email do Usuário (ou preencha o ID)')
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder('usuario@exemplo.com')
+      .setRequired(false);
 
     // Create the description input
     const descriptionInput = new TextInputBuilder()
@@ -89,10 +97,11 @@ export async function handleAddPointsButton(interaction, authToken) {
 
     // Add inputs to the modal
     const userIdRow = new ActionRowBuilder().addComponents(userIdInput);
+    const emailRow = new ActionRowBuilder().addComponents(emailInput);
     const descriptionRow = new ActionRowBuilder().addComponents(descriptionInput);
     const pointsRow = new ActionRowBuilder().addComponents(pointsInput);
 
-    modal.addComponents(userIdRow, descriptionRow, pointsRow);
+    modal.addComponents(userIdRow, emailRow, descriptionRow, pointsRow);
 
     // Show the modal to the user
     await interaction.showModal(modal);
@@ -118,10 +127,18 @@ export async function handleRemovePointsButton(interaction, authToken) {
     // Create the user ID input
     const userIdInput = new TextInputBuilder()
       .setCustomId('userId')
-      .setLabel('ID do Usuário')
+      .setLabel('ID do Usuário (ou preencha o Email)')
       .setStyle(TextInputStyle.Short)
       .setPlaceholder('123456789012345678')
-      .setRequired(true);
+      .setRequired(false);
+      
+    // Create the email input
+    const emailInput = new TextInputBuilder()
+      .setCustomId('email')
+      .setLabel('Email do Usuário (ou preencha o ID)')
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder('usuario@exemplo.com')
+      .setRequired(false);
 
     // Create the description input
     const descriptionInput = new TextInputBuilder()
@@ -141,10 +158,11 @@ export async function handleRemovePointsButton(interaction, authToken) {
 
     // Add inputs to the modal
     const userIdRow = new ActionRowBuilder().addComponents(userIdInput);
+    const emailRow = new ActionRowBuilder().addComponents(emailInput);
     const descriptionRow = new ActionRowBuilder().addComponents(descriptionInput);
     const pointsRow = new ActionRowBuilder().addComponents(pointsInput);
 
-    modal.addComponents(userIdRow, descriptionRow, pointsRow);
+    modal.addComponents(userIdRow, emailRow, descriptionRow, pointsRow);
 
     // Show the modal to the user
     await interaction.showModal(modal);
@@ -165,11 +183,21 @@ export async function handlePointsModalSubmit(interaction, webhookUrl, authToken
   try {
     // Get form values
     const userId = interaction.fields.getTextInputValue('userId');
+    const email = interaction.fields.getTextInputValue('email');
     const description = interaction.fields.getTextInputValue('description');
     const points = interaction.fields.getTextInputValue('points');
     
     // Determine action based on the modal customId
     const action = interaction.customId === 'dinastia_addPointsModal' ? 'add' : 'remove';
+    
+    // Validate that at least userId OR email is provided
+    if (!userId && !email) {
+      await interaction.reply({ 
+        content: 'É obrigatório fornecer o ID do usuário OU o email.', 
+        ephemeral: true 
+      });
+      return;
+    }
     
     // Validate points value
     const pointsValue = parseInt(points, 10);
@@ -199,6 +227,7 @@ export async function handlePointsModalSubmit(interaction, webhookUrl, authToken
         headers: headers,
         body: JSON.stringify({
           userId,
+          email,
           description,
           points: pointsValue,
           action, // 'add' or 'remove'
@@ -214,8 +243,20 @@ export async function handlePointsModalSubmit(interaction, webhookUrl, authToken
       const actionText = action === 'add' ? 'adicionados' : 'removidos';
       const actionPreposition = action === 'add' ? 'para' : 'de';
       
+      // Preparar a mensagem de sucesso
+      let successMessage = `✅ Operação realizada com sucesso!\n\n**${pointsValue}** pontos foram ${actionText} ${actionPreposition} `;
+      
+      // Se tiver userId, menciona o usuário, senão mostra o email
+      if (userId) {
+        successMessage += `<@${userId}>`;
+      } else {
+        successMessage += `${email}`;
+      }
+      
+      successMessage += `.\n**Motivo:** ${description}`;
+      
       await interaction.editReply({ 
-        content: `✅ Operação realizada com sucesso!\n\n**${pointsValue}** pontos foram ${actionText} ${actionPreposition} <@${userId}>.\n**Motivo:** ${description}`, 
+        content: successMessage, 
         components: [] 
       });
     } catch (error) {
