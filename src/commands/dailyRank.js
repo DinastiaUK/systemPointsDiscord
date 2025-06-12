@@ -43,27 +43,47 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl, a
       headers['Authorization'] = authToken;
     }
     
-    const response = await fetch(webhookUrl, {
-      method: 'GET',
-      headers: headers
-    });
+    console.log(`Tentando conectar ao webhook: ${webhookUrl}`);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch rank data: ${response.status} ${response.statusText}`);
-    }
+    // Adicionar timeout de 30 segundos para a requisição
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos
     
-    // Primeiro tentamos obter o texto da resposta
-    const responseText = await response.text();
-    console.log('Rank response received:', responseText);
+    // Declarar variáveis no escopo externo
+    let responseText = '';
+    let rankData = null;
     
-    // Verificamos se a resposta é um texto simples ou um JSON
-    let rankData;
     try {
-      // Tentamos converter para JSON
-      rankData = JSON.parse(responseText);
-    } catch (e) {
-      // Se não for um JSON válido, usamos o texto como está
-      console.log('Response is not valid JSON, using as plain text');
+      const response = await fetch(webhookUrl, {
+        method: 'GET',
+        headers: headers,
+        signal: controller.signal
+      });
+      
+      // Limpar o timeout após a resposta
+      clearTimeout(timeoutId);
+    
+      if (!response.ok) {
+        throw new Error(`Failed to fetch rank data: ${response.status} ${response.statusText}`);
+      }
+      
+      // Primeiro tentamos obter o texto da resposta
+      responseText = await response.text();
+      console.log('Rank response received:', responseText);
+      
+      // Verificamos se a resposta é um texto simples ou um JSON
+      try {
+        // Tentamos converter para JSON
+        rankData = JSON.parse(responseText);
+      } catch (e) {
+        // Se não for um JSON válido, usamos o texto como está
+        console.log('Response is not valid JSON, using as plain text');
+      }
+    } catch (fetchError) {
+      if (fetchError.name === 'AbortError') {
+        throw new Error(`Timeout ao tentar conectar com o webhook após 30 segundos: ${webhookUrl}`);
+      }
+      throw fetchError;
     }
     
     // Get the channel

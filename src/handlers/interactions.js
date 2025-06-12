@@ -32,6 +32,10 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
           case 'dinastia_remove_points':
             await handleRemovePointsButton(interaction, authToken);
             break;
+          case 'email_request':
+            // Ignorar silenciosamente este botão de outro bot
+            console.log(`Ignorando botão de outro bot: ${interaction.customId}`);
+            break;
           default:
             console.log(`Unknown button interaction: ${interaction.customId}`);
         }
@@ -45,6 +49,10 @@ export function setupInteractionHandler(client, registerWebhookUrl, consultPoint
           case 'dinastia_addPointsModal':
           case 'dinastia_removePointsModal':
             await handlePointsModalSubmit(interaction, managePointsWebhookUrl, authToken);
+            break;
+          case 'email_form':
+            // Ignorar silenciosamente este modal de outro bot
+            console.log(`Ignorando modal de outro bot: ${interaction.customId}`);
             break;
           default:
             console.log(`Unknown modal submission: ${interaction.customId}`);
