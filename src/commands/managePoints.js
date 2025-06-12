@@ -169,7 +169,7 @@ export async function handlePointsModalSubmit(interaction, webhookUrl, authToken
     const points = interaction.fields.getTextInputValue('points');
     
     // Determine action based on the modal customId
-    const action = interaction.customId === 'addPointsModal' ? 'add' : 'remove';
+    const action = interaction.customId === 'dinastia_addPointsModal' ? 'add' : 'remove';
     
     // Validate points value
     const pointsValue = parseInt(points, 10);
