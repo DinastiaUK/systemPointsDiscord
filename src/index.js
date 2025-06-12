@@ -119,6 +119,10 @@ client.once('ready', async () => {
         console.error('Please check that the RANK_ID is correct and the bot has access to this channel.');
       }
     }
+
+    // Post rank on startup
+    console.log('Attempting to post rank on startup...');
+    fetchAndPostDailyRank(client, RANK_ID, RANK_WEBHOOK, AUTH_WEBHOOK);
   } catch (err) {
     console.error('Error during initialization:', err);
   }
