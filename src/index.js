@@ -21,6 +21,7 @@ import { sendRegistrationMessage } from './commands/register.js';
 import { sendConsultPointsMessage } from './commands/consultPoints.js';
 import { sendManagePointsMessage } from './commands/managePoints.js';
 import { scheduleDailyRank } from './utils/scheduler.js';
+import { fetchAndPostDailyRank } from './commands/dailyRank.js';
 
 // Environment variables
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
