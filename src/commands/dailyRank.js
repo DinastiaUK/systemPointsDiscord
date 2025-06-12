@@ -85,7 +85,10 @@ export async function fetchAndPostDailyRank(client, rankChannelId, webhookUrl, a
     let messageContent;
     
     // Determinar o conteúdo da mensagem com base no tipo de dados recebidos
-    if (rankData && Array.isArray(rankData) && rankData.length > 0) {
+    if (rankData && typeof rankData === 'object' && rankData.message) {
+        // Se o JSON tem uma propriedade 'message', usamos seu valor
+        messageContent = rankData.message;
+    } else if (rankData && Array.isArray(rankData) && rankData.length > 0) {
       // Se for um array de usuários, formatar a mensagem
       try {
         // Limitar a 10 usuários
